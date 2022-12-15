@@ -31,20 +31,32 @@ class _PaymentCardTextFormScreenState extends State<PaymentCardTextFormScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text("Payment status: ${status.name}"),
-            const SizedBox(height: 16),
-            CardFormField(controller: controller),
+            if (status == PaymentStatus.success)
+              const Center(
+                child: Text("Payment successful"),
+              ),
+            if (status == PaymentStatus.fail)
+              const Center(
+                child: Text("Payment failed"),
+              )
+            else ...[CardFormField(controller: controller)],
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 16),
               child: MaterialButton(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 minWidth: MediaQuery.of(context).size.width / 2,
                 color: Colors.black,
-                onPressed: () => tryToPay(),
-                child: const Center(
+                onPressed: () {
+                  if (status == PaymentStatus.success) {
+                    Navigator.of(context).pop();
+                  } else {
+                    tryToPay();
+                  }
+                },
+                child: Center(
                   child: Text(
-                    "Pay",
-                    style: TextStyle(color: Colors.white, fontSize: 16),
+                    status == PaymentStatus.success || status == PaymentStatus.fail ? "Back" : "Pay",
+                    style: const TextStyle(color: Colors.white, fontSize: 16),
                   ),
                 ),
               ),
@@ -98,7 +110,6 @@ class _PaymentCardTextFormScreenState extends State<PaymentCardTextFormScreen> {
   Future<void> _confirmPaymentIntentId(String clientSecret) async {
     try {
       final paymentIntent = await Stripe.instance.handleNextAction(clientSecret);
-
       if (paymentIntent.status == PaymentIntentsStatus.RequiresConfirmation) {
         debugPrint("Required confirmation, sending confirmation request");
         final Map response = await _postConfirmPaymentIntent(paymentIntent.id);
@@ -111,6 +122,7 @@ class _PaymentCardTextFormScreenState extends State<PaymentCardTextFormScreen> {
         }
       }
     } catch (e) {
+      debugPrint("Confirmation error: $e");
       setState(() => status = PaymentStatus.fail);
     }
   }

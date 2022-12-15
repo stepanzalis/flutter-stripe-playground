@@ -7,7 +7,8 @@ enum PaymentStatus { init, success, fail, loading }
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  Stripe.publishableKey = "pk_test_xxx"; // add your publishable key
+  Stripe.publishableKey =
+      "pk_test_51MEaDHFSzCxeR9xh5Czq3be8OhzlQS4ySygfwEu2RlFwjMuH7GdRXrIELIWs3vIZQmG9uR78IqpNABoeOQuGfOJ4000C9uxLId"; // add your publishable key
   Stripe.instance.applySettings();
 
   runApp(const MyApp());
