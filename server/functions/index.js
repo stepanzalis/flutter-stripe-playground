@@ -7,7 +7,7 @@ const generateIntentResponse = function (intent) {
             console.log("Payment confirmation needed")
             return {
                 clientSecret: intent.client_secret,
-                requireAction: true,
+                requiresAction: true,
                 status: intent.status
             }
         }
@@ -15,7 +15,7 @@ const generateIntentResponse = function (intent) {
             console.log("Payment action needed")
             return {
                 clientSecret: intent.client_secret,
-                requireAction: true,
+                requiresAction: true,
                 status: intent.status
             }
         }
@@ -46,8 +46,9 @@ exports.createPaymentIntentId = functions.https.onRequest(async (req, res) => {
         const params = {
             amount: orderAmount,
             currency: "czk",
+            confirmation_method: "manual",
             payment_method: paymentMethodId,
-            payment_method_types: ['card'],
+            confirm: true,
         }
 
         const intent = await stripe.paymentIntents.create(params);
